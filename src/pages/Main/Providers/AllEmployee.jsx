@@ -19,6 +19,7 @@ const AllEmployee = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [client, setClient] = useState();
+  const [totalData, setTotalData] = useState(0);
   const handleView = (value) => {
     setClient(value);
     setIsModalOpen(true);
@@ -32,7 +33,7 @@ const AllEmployee = () => {
     if (!token) {
       navigate("/auth");
     }
-    fetch(baseURL + "/businesses", {
+    fetch(baseURL + "/businesses?page=" + currentPage, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -42,6 +43,7 @@ const AllEmployee = () => {
       .then((data) => {
         if (data.ok) {
           setProviders(data.data);
+          setTotalData(data.pagination.totalData);
         }
       })
       .catch((err) => {
@@ -51,7 +53,7 @@ const AllEmployee = () => {
           text: "Something went wrong! Please try again later",
         });
       });
-  }, [navigate]);
+  }, [navigate, currentPage]);
 
   const columns = [
     {
@@ -129,29 +131,29 @@ const AllEmployee = () => {
     return `${base}?${query}`;
   }
 
-  async function filterData() {
-    const params = {
-      page: currentPage,
-      name: filteredInfo.name,
-      startDate: filteredInfo.startDate,
-      endDate: filteredInfo.endDate,
-    };
+  // async function filterData() {
+  //   const params = {
+  //     page: currentPage,
+  //     name: filteredInfo.name,
+  //     startDate: filteredInfo.startDate,
+  //     endDate: filteredInfo.endDate,
+  //   };
 
-    const url = buildUrl(baseURL + "/providers", params);
+  //   const url = buildUrl(baseURL + "/providers", params);
 
-    const token = localStorage.getItem("token");
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  //   const token = localStorage.getItem("token");
+  //   const response = await fetch(url, {
+  //     headers: {
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //   });
 
-    const data = await response.json();
-    if (data.providers) {
-      if (data.redirect) navigate(data.redirect);
-      setProviders(data.providers);
-    }
-  }
+  //   const data = await response.json();
+  //   if (data.providers) {
+  //     if (data.redirect) navigate(data.redirect);
+  //     setProviders(data.providers);
+  //   }
+  // }
 
   const { RangePicker } = DatePicker;
   return (
@@ -179,7 +181,7 @@ const AllEmployee = () => {
             type="primary"
             shape="circle"
             icon={<SearchOutlined />}
-            onClick={filterData}
+            // onClick={filterData}
           />
         </Space>
       </div>
@@ -198,6 +200,10 @@ const AllEmployee = () => {
           <Table
             pagination={{
               position: ["bottomCenter"],
+              current: currentPage,
+              onChange: (page) => setCurrentPage(page),
+              total: totalData,
+              pageSize: 10,
             }}
             columns={columns}
             dataSource={providers}
@@ -268,11 +274,38 @@ const AllEmployee = () => {
               <p>Joining date:</p>
               <p>{client?.createdAt?.slice(0, 10)}</p>
             </div>
-            {/* <div className="flex items-center justify-center mt-5">
-              <button className="py-3 px-7 rounded-xl bg-red-300 text-red-500">
-                Delete Provider
+            <div className="flex items-center justify-center mt-5">
+              <button
+                className="py-3 px-7 rounded-xl bg-red-300 text-red-500"
+                onClick={() => {
+                  fetch(baseURL + "/users/" + client.userId, {
+                    method: "DELETE",
+                    headers: {
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                  })
+                    .then((res) => res.json())
+                    .then((res) => {
+                      if (res.ok) {
+                        Swal.fire({
+                          icon: "success",
+                          title: "Success",
+                          text: "User deleted successfully",
+                        });
+                        window.location.reload();
+                      } else {
+                        Swal.fire({
+                          icon: "error",
+                          title: "Oops...",
+                          text: "Something went wrong! Please try again later",
+                        });
+                      }
+                    });
+                }}
+              >
+                Delete
               </button>
-            </div> */}
+            </div>
           </div>
         </div>
       </Modal>

@@ -1,24 +1,35 @@
-import { ConfigProvider, DatePicker, Space, Table, Input, Button, Modal } from "antd";
+import {
+  ConfigProvider,
+  DatePicker,
+  Space,
+  Table,
+  Input,
+  Button,
+  Modal,
+} from "antd";
 import { UserOutlined, SearchOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { baseURL } from "../../../config";
 import { BsInfoCircle } from "react-icons/bs";
+import Swal from "sweetalert2";
 
 export default function Communications() {
   const { RangePicker } = DatePicker;
   const [communications, setCommunications] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [totalData, setTotalData] = useState(0);
   const [client, setClient] = useState();
 
   const navigate = useNavigate();
   useEffect(() => {
+    setCommunications([]);
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/auth");
     }
-    fetch(baseURL + "/communications", {
+    fetch(baseURL + "/communications?page=" + currentPage, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -28,9 +39,10 @@ export default function Communications() {
       .then((data) => {
         if (data.ok) {
           setCommunications(data.data);
+          setTotalData(data.pagination.totalData);
         }
       });
-  }, [navigate]);
+  }, [navigate, currentPage]);
 
   const columns = [
     {
@@ -40,7 +52,8 @@ export default function Communications() {
     {
       title: "Customer Name",
       dataIndex: "user",
-      render: (user) => (user ? user.firstName + " " + user.lastName : "Guest User"),
+      render: (user) =>
+        user ? user.firstName + " " + user.lastName : "Guest User",
     },
     {
       title: "Business Name",
@@ -48,15 +61,14 @@ export default function Communications() {
       render: (business) => business?.name ?? "",
     },
     {
-      title: "Date",
-      dataIndex: "createdAt",
-      render: (text) => text?.slice(0, 10),
+      title: "Type",
+      dataIndex: "type",
     },
-    {
-      title: "Time",
-      dataIndex: "createdAt",
-      render: (text) => text?.slice(11, 19),
-    },
+    // {
+    //   title: "Time",
+    //   dataIndex: "createdAt",
+    //   render: (text) => text?.slice(11, 19),
+    // },
     {
       title: "Status",
       dataIndex: "status",
@@ -122,6 +134,10 @@ export default function Communications() {
           <Table
             pagination={{
               position: ["bottomCenter"],
+              current: currentPage,
+              onChange: (page) => setCurrentPage(page),
+              total: totalData,
+              pageSize: 10,
             }}
             columns={columns}
             dataSource={communications}
@@ -142,7 +158,11 @@ export default function Communications() {
           <div className="p-[20px] text-white">
             <div className="flex justify-between border-b py-[16px]">
               <p>Customer Name:</p>
-              <p>{client?.user?client.user.firstName+" "+client.user.lastName:"N/A"}</p>
+              <p>
+                {client?.user
+                  ? client.user.firstName + " " + client.user.lastName
+                  : "N/A"}
+              </p>
             </div>
             <div className="flex justify-between border-b py-[16px] ">
               <p>Business Name:</p>
@@ -152,23 +172,61 @@ export default function Communications() {
               <p>Type:</p>
               <p>{client?.type}</p>
             </div>
-            <div className="flex justify-between py-[16px]">
-              <p>CreatedAt date:</p>
+            {client?.type === "MESSAGE" && (
+              <div className="flex justify-between border-b py-[16px]">
+                <p>Type:</p>
+                <p>{client?.type}</p>
+              </div>
+            )}
+            <div className="flex justify-between border-b py-[16px]">
+              <p>Date:</p>
               <p>{client?.createdAt?.slice(0, 10)}</p>
             </div>
-            <div className="flex justify-between py-[16px]">
-              <p>UpdatedAt date:</p>
-              <p>{client?.updatedAt?.slice(0, 10)}</p>
+            <div className="flex justify-between border-b py-[16px]">
+              <p>Time:</p>
+              <p>{client?.createdAt?.slice(11, 19)}</p>
             </div>
             <div className="flex justify-between border-b py-[16px]">
               <p> Status:</p>
               <p>{client?.status}</p>
             </div>
-            {/* <div className="flex items-center justify-center mt-5">
-              <button className="py-3 px-7 rounded-xl bg-red-300 text-red-500">
-                Delete Customer
-              </button>
-            </div> */}
+            {client?.status !== "PENDING" && (
+              <div className="flex justify-between border-b py-[16px]">
+                <p>
+                  {client?.status === "SENDED"
+                    ? "Last mail send:"
+                    : "reviewed At:"}
+                </p>
+                <p>{client?.updatedAt?.slice(0, 10)}</p>
+              </div>
+            )}
+            {client?.status !== "REVIEWED" && client?.user && (
+              <div className="flex items-center justify-center mt-5">
+                <button
+                  className="py-3 px-7 rounded-xl bg-green-600 text-white"
+                  onClick={() => {
+                    fetch(baseURL + "/communications/" + client?.id, {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    })
+                      .then((res) => res.json())
+                      .then((res) => {
+                        Swal.fire({
+                          icon: res.ok ? "success" : "error",
+                          title: res.message,
+                          showConfirmButton: false,
+                          timer: 1500,
+                        });
+                      });
+                  }}
+                >
+                  Send Email
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </Modal>

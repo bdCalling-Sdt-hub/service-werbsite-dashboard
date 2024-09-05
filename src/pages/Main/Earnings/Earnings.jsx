@@ -10,12 +10,13 @@ const Earnings = () => {
 
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalData, setTotalData] = useState(0);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/auth");
     }
-    fetch(baseURL + "/payments", {
+    fetch(baseURL + "/payments?page="+currentPage, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -25,12 +26,13 @@ const Earnings = () => {
       .then((data) => {
         if (data.ok) {
           setData(data.data);
+          setTotalData(data.pagination.totalData);
         }
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [navigate]);
+  }, [navigate, currentPage]);
 
   const columns = [
     {
@@ -197,6 +199,10 @@ const Earnings = () => {
           <Table
             pagination={{
               position: ["bottomCenter"],
+              current: currentPage,
+              onChange: (page) => setCurrentPage(page),
+              total: totalData,
+              pageSize: 10,
             }}
             columns={columns}
             dataSource={data}

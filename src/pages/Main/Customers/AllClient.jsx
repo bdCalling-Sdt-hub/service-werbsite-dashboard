@@ -20,6 +20,8 @@ const AllClient = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [client, setClient] = useState();
   const [customers, setCustomers] = useState([{}]);
+  const [totalData, setTotalData] = useState(0);
+
   const handleView = (value) => {
     setClient(value);
     setIsModalOpen(true);
@@ -31,7 +33,7 @@ const AllClient = () => {
     if (!token) {
       navigate("/auth");
     }
-    fetch(baseURL + "/users?type=CUSTOMER", {
+    fetch(baseURL + "/users?type=CUSTOMER&page=" + currentPage, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -41,6 +43,7 @@ const AllClient = () => {
       .then((data) => {
         if (data.ok) {
           setCustomers(data.data);
+          setTotalData(data.pagination.totalData);
         }
       })
       .catch((err) => {
@@ -50,7 +53,7 @@ const AllClient = () => {
           text: "Something went wrong! Please try again later",
         });
       });
-  }, [navigate]);
+  }, [navigate, currentPage]);
 
   const columns = [
     {
@@ -182,6 +185,10 @@ const AllClient = () => {
           <Table
             pagination={{
               position: ["bottomCenter"],
+              current: currentPage,
+              onChange: (page) => setCurrentPage(page),
+              total: totalData,
+              pageSize: 10,
             }}
             columns={columns}
             dataSource={customers}
