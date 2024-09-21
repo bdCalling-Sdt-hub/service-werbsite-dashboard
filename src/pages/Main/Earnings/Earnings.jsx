@@ -11,12 +11,20 @@ const Earnings = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalData, setTotalData] = useState(0);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/auth");
     }
-    fetch(baseURL + "/payments?page="+currentPage, {
+
+    const url = buildUrl(baseURL + "/payments", {
+      page: currentPage,
+      startDate: filteredInfo.startDate,
+      endDate: filteredInfo.endDate,
+    });
+
+    fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -36,8 +44,8 @@ const Earnings = () => {
 
   const columns = [
     {
-      title: "ID",
-      dataIndex: "id",
+      title: "Trx_ID",
+      dataIndex: "transactionId",
     },
     {
       title: "Business Name",
@@ -60,10 +68,6 @@ const Earnings = () => {
     },
   ];
 
-  const onChange = (date, dateString) => {
-    console.log(date, dateString);
-  };
-
   const { RangePicker } = DatePicker;
   const [filteredInfo, setFilteredInfo] = useState({
     name: null,
@@ -85,7 +89,6 @@ const Earnings = () => {
   async function filterData() {
     const params = {
       page: currentPage,
-      name: filteredInfo.name,
       startDate: filteredInfo.startDate,
       endDate: filteredInfo.endDate,
     };
@@ -100,33 +103,11 @@ const Earnings = () => {
     });
 
     const data = await response.json();
-    if (data.payments) {
-      if (data.redirect) navigate(data.redirect);
-      setData(data.payments);
+    if (data.ok) {
+      setData(data.data);
+      setTotalData(data.pagination.totalData);
     }
   }
-
-  const [suggestions, setSuggestions] = useState([]);
-  const [isFocused, setIsFocused] = useState(false);
-
-  useEffect(() => {
-    if (filteredInfo.name) {
-      fetch(
-        baseURL + "/userSuggetion?type=PROVIDER&name=" + filteredInfo.name,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.users) setSuggestions(data.users);
-        });
-    } else {
-      setSuggestions([]);
-    }
-  }, [filteredInfo.name]);
 
   return (
     <div className=" ml-[24px]">
@@ -142,40 +123,6 @@ const Earnings = () => {
               })
             }
           />
-          <div className="relative z-50">
-            <Input
-              placeholder="Search Customer"
-              prefix={<UserOutlined />}
-              value={filteredInfo.name}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() =>
-                setTimeout(() => {
-                  setIsFocused(false);
-                }, 300)
-              }
-              onChange={(e) =>
-                setFilteredInfo({ ...filteredInfo, name: e.target.value })
-              }
-            />
-            {suggestions.length > 0 && isFocused && (
-              <ul className="absolute z-100 top-[40px] bg-white w-full border border-gray-300 rounded-lg">
-                {suggestions.map((suggestion) => (
-                  <li
-                    onClick={() =>
-                      setFilteredInfo({
-                        ...filteredInfo,
-                        name: suggestion.name,
-                      })
-                    }
-                    key={suggestion._id}
-                    className="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100"
-                  >
-                    {suggestion.name}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
           <Button
             type="primary"
             shape="circle"

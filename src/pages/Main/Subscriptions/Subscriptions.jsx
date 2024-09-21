@@ -4,6 +4,8 @@ import { MdAdd } from "react-icons/md";
 import { baseURL } from "../../../config";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { IoMdAdd } from "react-icons/io";
+import { FaMinus } from "react-icons/fa6";
 
 export default function Subscriptions() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -17,7 +19,7 @@ export default function Subscriptions() {
     name: "",
     price: "",
     minimumStart: "",
-    benefits: [],
+    benefits: [""],
   });
 
   useEffect(() => {
@@ -53,7 +55,7 @@ export default function Subscriptions() {
           {subscriptions.map((subscription, index) => (
             <div
               key={index}
-              className="rounded-3xl p-9 flex flex-col gap-6 bg-[#c9c7c7] items-start text-start lg:w-[387px]"
+              className="rounded-3xl p-9 flex flex-col gap-6 bg-slate-200 items-start text-start"
             >
               <h5 className="text-3xl text-black-500">{subscription.name}</h5>
               <ul className="flex flex-col gap-6">
@@ -63,6 +65,7 @@ export default function Subscriptions() {
                   </li>
                 ))}
               </ul>
+              <div className="mt-auto w-full flex flex-col gap-2">
               <p className="text-black-200">
                 <span className="text-3xl font-bold text-black-500">
                   ${subscription.price}
@@ -124,6 +127,7 @@ export default function Subscriptions() {
               >
                 Delete
               </button>
+              </div>
             </div>
           ))}
         </div>
@@ -149,7 +153,12 @@ export default function Subscriptions() {
                   "Content-Type": "application/json",
                 },
                 method: "POST",
-                body: JSON.stringify(newSubscription),
+                body: JSON.stringify({
+                  ...newSubscription,
+                  minimumStart: isNaN(Number(newSubscription.minimumStart))
+                    ? 0
+                    : Number(newSubscription.minimumStart),
+                }),
               })
                 .then((res) => res.json())
                 .then((data) => {
@@ -161,6 +170,11 @@ export default function Subscriptions() {
                       timer: 1500,
                     }).then(() => {
                       window.location.reload();
+                    });
+                  } else {
+                    Swal.fire({
+                      icon: "error",
+                      title: data.message,
                     });
                   }
                 });
@@ -174,6 +188,7 @@ export default function Subscriptions() {
               onChange={(e) =>
                 setNewSubscription({ ...newSubscription, name: e.target.value })
               }
+              required
               placeholder="Enter Subscription name"
               className="p-4 text-black"
             />
@@ -186,9 +201,10 @@ export default function Subscriptions() {
                 if (isNaN(e.target.value)) return;
                 setNewSubscription({
                   ...newSubscription,
-                  price: e.target.value,
+                  price: Number(e.target.value),
                 });
               }}
+              required
               placeholder="Enter Subscription Price"
               className="p-4 text-black"
             />
@@ -204,7 +220,7 @@ export default function Subscriptions() {
                   minimumStart: e.target.value,
                 });
               }}
-              placeholder="Enter Subscription Duration in days"
+              placeholder="Enter Minimum Star (not required default 0)"
               className="p-4 text-black"
             />
             <label htmlFor="">Subscription Fetchers </label>
@@ -214,16 +230,39 @@ export default function Subscriptions() {
                   type="text"
                   value={benefit.name}
                   onChange={(e) => {
-                    const newFetchers = [...newSubscription.benefit];
-                    newFetchers[index].name = e.target.value;
+                    const newFetchers = [...newSubscription.benefits];
+                    newFetchers[index] = e.target.value;
                     setNewSubscription({
                       ...newSubscription,
-                      benefit: newFetchers,
+                      benefits: newFetchers,
                     });
                   }}
                   placeholder="your subscription fetchers"
                   className="p-4 text-black w-full"
                 />
+                {newSubscription.benefits.length === index + 1 ? (
+                  <IoMdAdd
+                    className="w-10 h-10 bg-slate-500 cursor-pointer"
+                    onClick={() =>
+                      setNewSubscription({
+                        ...newSubscription,
+                        benefits: [...newSubscription.benefits, ""],
+                      })
+                    }
+                  />
+                ) : (
+                  <FaMinus
+                    className="w-10 h-10 bg-slate-500 cursor-pointer"
+                    onClick={() => {
+                      const newFetchers = [...newSubscription.benefits];
+                      newFetchers.splice(index, 1);
+                      setNewSubscription({
+                        ...newSubscription,
+                        benefits: newFetchers,
+                      });
+                    }}
+                  />
+                )}
               </div>
             ))}
             <button className="py-4 w-full bg-green-700 rounded">
@@ -247,7 +286,7 @@ export default function Subscriptions() {
             className="p-[20px] text-white flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              fetch(baseURL + "/subscriptions", {
+              fetch(baseURL + "/subscriptions/"+client.id, {
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem("token")}`,
                   "Content-Type": "application/json",
@@ -288,60 +327,67 @@ export default function Subscriptions() {
                 if (isNaN(e.target.value)) return;
                 setClient({
                   ...client,
-                  price: e.target.value,
+                  price: Number(e.target.value),
                 });
               }}
               placeholder="Enter Subscription Price"
               className="p-4 text-black"
             />
-            <label htmlFor="">Subscription Duration</label>
+            <label htmlFor="">Minimum Star</label>
             <input
               type="text"
-              name="duration"
-              value={client?.duration}
+              name="Minimum Star"
+              value={client?.minimumStart || ""}
               onChange={(e) => {
                 if (isNaN(e.target.value)) return;
                 setClient({
                   ...client,
-                  duration: e.target.value,
+                  minimumStart: Number(e.target.value),
                 });
               }}
               placeholder="Enter Subscription Duration"
               className="p-4 text-black"
             />
             <label htmlFor="">Subscription Fetchers </label>
-            {client?.features?.map((fetcher, index) => (
+            {client?.benefits?.map((fetcher, index) => (
               <div className="flex items-center gap-5 w-full" key={index}>
                 <input
                   type="text"
-                  value={fetcher?.name}
+                  value={fetcher}
                   onChange={(e) => {
-                    const newFetchers = [...client.features];
-                    newFetchers[index].name = e.target.value;
+                    const newFetchers = [...client.benefits];
+                    newFetchers[index] = e.target.value;
                     setClient({
                       ...client,
-                      features: newFetchers,
+                      benefits: newFetchers,
                     });
                   }}
                   placeholder="your subscription fetchers"
                   className="p-4 text-black w-full"
                 />
-                <div>
-                  <input
-                    type="checkbox"
-                    className="w-5 h-5"
-                    checked={fetcher?.included}
-                    onChange={(e) => {
-                      const newFetchers = [...client.features];
-                      newFetchers[index].included = e.target.checked;
+                {client.benefits.length === index + 1 ? (
+                  <IoMdAdd
+                    className="w-10 h-10 bg-slate-500 cursor-pointer"
+                    onClick={() =>
                       setClient({
                         ...client,
-                        features: newFetchers,
+                        benefits: [...client.benefits, ""],
+                      })
+                    }
+                  />
+                ) : (
+                  <FaMinus
+                    className="w-10 h-10 bg-slate-500 cursor-pointer"
+                    onClick={() => {
+                      const newFetchers = [...client.benefits];
+                      newFetchers.splice(index, 1);
+                      setClient({
+                        ...client,
+                        benefits: newFetchers,
                       });
                     }}
                   />
-                  <span>Included</span>
-                </div>
+                )}
               </div>
             ))}
             <button className="py-4 w-full bg-green-700 rounded">

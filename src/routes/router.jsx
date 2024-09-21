@@ -21,12 +21,19 @@ import Earnings from "../pages/Main/Earnings/Earnings";
 import Services from "../pages/Main/Services/Services";
 import Subscriptions from "../pages/Main/Subscriptions/Subscriptions";
 import Communications from "../pages/Main/Communication/Communications";
+import Notification from "../pages/Main/Notification/Notification.jsx";
+import Review from "../pages/Main/Review/Review.jsx";
+import Report from "../pages/Main/Report/Report.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Main />,
     children: [
+      {
+        path:"/notification",
+        element:<Notification/>
+      },
       {
         path: "/",
         element: <DashboardHome />,
@@ -52,8 +59,12 @@ const router = createBrowserRouter([
         element: <Subscriptions />,
       },
       {
-        path: "/notification",
-        // element: <Notification/>,
+        path: "/reviews",
+        element: <Review />,
+      },
+      {
+        path:"/report",
+        element:<Report/>
       },
       {
         path: "/communications",

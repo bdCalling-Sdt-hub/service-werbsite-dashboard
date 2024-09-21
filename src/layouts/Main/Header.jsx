@@ -45,7 +45,7 @@ const Header = ({toggleCollapsed,collapsed}) => {
           onClick={(e) => navigate("notification")}
           className="relative flex items-center "
         >
-          <Badge style={{ backgroundColor: "#318130" }} count={5}>
+          <Badge style={{ backgroundColor: "#318130" }}>
             <IoIosNotificationsOutline
               style={{ cursor: "pointer" }}
               className={` bg-primary w-[52px] h-[52px] text-[white] border-2 border-[white] rounded-full p-2 `}
@@ -53,12 +53,12 @@ const Header = ({toggleCollapsed,collapsed}) => {
           </Badge>
         </div>
         {/* </Dropdown> */}
-        <div
+        {/* <div
           onClick={() => navigate("profile-information")}
           className="flex items-center cursor-pointer mr-[30px] bg-primary text-white rounded-full p-1"
         >
           <FaRegUser className="text-[white] border-2 border-[white] rounded-full p-2 w-[52px] h-[52px]" />
-        </div>
+        </div> */}
       </div>
     </div>
   );

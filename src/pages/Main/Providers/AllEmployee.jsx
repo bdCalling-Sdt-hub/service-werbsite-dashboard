@@ -33,7 +33,14 @@ const AllEmployee = () => {
     if (!token) {
       navigate("/auth");
     }
-    fetch(baseURL + "/businesses?page=" + currentPage, {
+    const url = buildUrl(baseURL + "/businesses", {
+      page: currentPage,
+      name: filteredInfo.name,
+      startDate: filteredInfo.startDate,
+      endDate: filteredInfo.endDate,
+    });
+
+    fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -57,27 +64,9 @@ const AllEmployee = () => {
 
   const columns = [
     {
-      title: "ID",
-      dataIndex: "_id",
-    },
-    {
       title: "Business Name",
       dataIndex: "name",
-      // render: (user) => (
-      //   <div className="flex gap-2 items-center">
-      //     <img
-      //       className="w-[34px] h-[34px] rounded-full"
-      //       src={user?.image}
-      //       alt={user?.name}
-      //     />
-      //     <p className="font-medium">{user?.provider?.businessName}</p>
-      //   </div>
-      // ),
     },
-    // {
-    //   title: "Email",
-    //   dataIndex: "email",
-    // },
     {
       title: "Address",
       dataIndex: "address",
@@ -99,6 +88,12 @@ const AllEmployee = () => {
       title: "Join Date",
       dataIndex: "createdAt",
       render: (createdAt) => createdAt?.slice(0, 10),
+    },
+    {
+      title: "Status",
+      dataIndex: "subscriptionEndAt",
+      render: (subscriptionEndAt) =>
+        new Date(subscriptionEndAt) > new Date() ? "Active" : "Inactive",
     },
     {
       title: "Action",
@@ -131,29 +126,29 @@ const AllEmployee = () => {
     return `${base}?${query}`;
   }
 
-  // async function filterData() {
-  //   const params = {
-  //     page: currentPage,
-  //     name: filteredInfo.name,
-  //     startDate: filteredInfo.startDate,
-  //     endDate: filteredInfo.endDate,
-  //   };
+  async function filterData() {
+    const params = {
+      page: currentPage,
+      name: filteredInfo.name,
+      startDate: filteredInfo.startDate,
+      endDate: filteredInfo.endDate,
+    };
 
-  //   const url = buildUrl(baseURL + "/providers", params);
+    const url = buildUrl(baseURL + "/businesses", params);
 
-  //   const token = localStorage.getItem("token");
-  //   const response = await fetch(url, {
-  //     headers: {
-  //       Authorization: `Bearer ${token}`,
-  //     },
-  //   });
+    const token = localStorage.getItem("token");
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  //   const data = await response.json();
-  //   if (data.providers) {
-  //     if (data.redirect) navigate(data.redirect);
-  //     setProviders(data.providers);
-  //   }
-  // }
+    const data = await response.json();
+    if (data.ok) {
+      setProviders(data.providers);
+      setTotalData(data.pagination.totalData);
+    }
+  }
 
   const { RangePicker } = DatePicker;
   return (
@@ -181,7 +176,7 @@ const AllEmployee = () => {
             type="primary"
             shape="circle"
             icon={<SearchOutlined />}
-            // onClick={filterData}
+            onClick={filterData}
           />
         </Space>
       </div>
@@ -236,7 +231,7 @@ const AllEmployee = () => {
             </div> */}
             <div className="flex justify-between border-b py-[16px]">
               <p>Email:</p>
-              <p>{client?.email}</p>
+              <p>{client?.user?.email}</p>
             </div>
             <div className="flex justify-between border-b py-[16px]">
               <p>Mobile number:</p>
@@ -251,17 +246,9 @@ const AllEmployee = () => {
               <p>{client?.address}</p>
             </div>
             <div className="flex justify-between border-b py-[16px]">
-              <p>Website:</p>
-              <p>{client?.website ?? "N/A"}</p>
-            </div>
-            <div className="flex justify-between border-b py-[16px]">
               <p>ABN:</p>
               <p>{client?.abn ?? "N/A"}</p>
             </div>
-            {/* <div className="flex justify-between border-b py-[16px]">
-              <p>Suburb:</p>
-              <p>{client?.email}</p>
-            </div> */}
             <div className="flex justify-between border-b py-[16px]">
               <p>License:</p>
               <p>{client?.license ?? "N/A  "}</p>
@@ -269,6 +256,18 @@ const AllEmployee = () => {
             <div className="flex justify-between border-b py-[16px]">
               <p>Opening Hr:</p>
               <p>{client?.openingHr ?? "N/A"}</p>
+            </div>
+            <div className="flex justify-between border-b py-[16px]">
+              <p>Website:</p>
+              <p>{client?.website ?? "N/A"}</p>
+            </div>
+            <div className="flex justify-between border-b py-[16px]">
+              <p>Facebook:</p>
+              <p>{client?.facebook ?? "N/A"}</p>
+            </div>
+            <div className="flex justify-between border-b py-[16px]">
+              <p>Instagram:</p>
+              <p>{client?.instagram ?? "N/A"}</p>
             </div>
             <div className="flex justify-between border-b py-[16px]">
               <p>Joining date:</p>

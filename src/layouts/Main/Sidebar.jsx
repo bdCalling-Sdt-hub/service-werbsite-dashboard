@@ -22,6 +22,11 @@ import { FaRegCopy } from "react-icons/fa6";
 import { AiOutlineDollarCircle } from "react-icons/ai";
 import Swal from "sweetalert2";
 
+import { MdOutlineDesignServices } from "react-icons/md";
+import { FaComments } from "react-icons/fa";
+import { MdReviews } from "react-icons/md";
+import { HiOutlineDocumentReport } from "react-icons/hi";
+
 function getItem(label, key, icon, children) {
   return {
     key,
@@ -105,7 +110,7 @@ const Sidebar = ({ collapsed }) => {
         Services
       </p>,
       "5",
-      <FaRegCopy style={{ fontSize: "24px" }} />
+      <MdOutlineDesignServices style={{ fontSize: "24px" }} />
     ),
     getItem(
       <p
@@ -125,39 +130,28 @@ const Sidebar = ({ collapsed }) => {
         Communications
       </p>,
       "7",
-      <FaRegCopy style={{ fontSize: "24px" }} />
+      <FaComments style={{ fontSize: "24px" }} />
     ),
-    // getItem(
-    //   <p
-    //     // onClick={(e) => navigate("/appointments")}
-    //     className="text-[18px] leading-normal"
-    //   >
-    //     Communication
-    //   </p>,
-    //   "7",
-    //   <FaRegClipboard  style={{ fontSize: "24px" }} />,
-    //    [
-    //     getItem(
-    //       <li
-    //         onClick={(e) => navigate("/communication/messages")}
-    //         className="text-[18px] leading-normal"
-    //       >
-    //         Messages
-    //       </li>,
-    //       "8"
-    //     ),
-    //     getItem(
-    //       <li
-    //         onClick={(e) => navigate("/communication/calls")}
-    //         className="text-[18px] leading-normal"
-    //       >
-    //         Calls
-    //       </li>,
-    //       "9"
-    //     ),
-    //   ]
-
-    // ),
+    getItem(
+      <p
+        onClick={(e) => navigate("/reviews")}    
+        className="text-[18px] leading-normal"
+      >
+        Reviews
+      </p>,
+      "8",
+      <MdReviews style={{ fontSize: "24px" }} />
+    ),
+    getItem(
+      <p
+        onClick={(e) => navigate("/report")}
+        className="text-[18px] leading-normal"
+      >
+        Report
+      </p>,
+      "9",
+      <HiOutlineDocumentReport style={{ fontSize: "24px" }} />
+    ),
 
     getItem(
       <p
@@ -189,25 +183,13 @@ const Sidebar = ({ collapsed }) => {
 
         <Menu
           style={{ width: "295px" }}
-          className={`w-[300px] p-[10px] bg-[#318130] `}
+          className={`w-[300px] p-2 bg-[#318130] `}
           defaultSelectedKeys={["1"]}
           mode={mode}
           theme={theme}
           items={items}
           inlineCollapsed={collapsed}
         />
-      </div>
-      <div className="mb-[32px]">
-        {/* <div
-          onClick={handleLogOut}
-          className="flex items-center ml-[18px] cursor-pointer gap-2 text-[white] font-medium"
-        >
-          <HiLogout width={25} height={25} />
-          <span className="text-[20px] ">Log Out</span>
-        </div> */}
-        {/* <Link to="/" className="flex items-center ml-[18px] cursor-pointer gap-2 text-[#3BA6F6] font-medium">
-            
-          </Link> */}
       </div>
     </div>
   );

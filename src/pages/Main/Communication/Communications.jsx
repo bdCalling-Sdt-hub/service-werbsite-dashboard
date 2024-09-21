@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { baseURL } from "../../../config";
 import { BsInfoCircle } from "react-icons/bs";
 import Swal from "sweetalert2";
+import { IoReloadOutline } from "react-icons/io5";
 
 export default function Communications() {
   const { RangePicker } = DatePicker;
@@ -46,10 +47,6 @@ export default function Communications() {
 
   const columns = [
     {
-      title: "ID",
-      render: (_, __, index) => index + 1,
-    },
-    {
       title: "Customer Name",
       dataIndex: "user",
       render: (user) =>
@@ -64,11 +61,16 @@ export default function Communications() {
       title: "Type",
       dataIndex: "type",
     },
-    // {
-    //   title: "Time",
-    //   dataIndex: "createdAt",
-    //   render: (text) => text?.slice(11, 19),
-    // },
+    {
+      title: "Date",
+      dataIndex: "createdAt",
+      render: (text) => text?.slice(0, 10),
+    },
+    {
+      title: "Time",
+      dataIndex: "createdAt",
+      render: (text) => text?.slice(11, 19),
+    },
     {
       title: "Status",
       dataIndex: "status",
@@ -89,6 +91,29 @@ export default function Communications() {
       ),
     },
   ];
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [processDone, setProcessDone] = useState(0);
+  const [processing, setProcessing] = useState(false);
+
+  async function handelSendEmail(id) {
+    const res = await fetch(baseURL + "/communications/" + id, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then((res) => res.json());
+
+    Swal.fire({
+      icon: res.ok ? "success" : "error",
+      title: res.message,
+      showConfirmButton: false,
+      timer: 1500,
+    });
+
+    return res.ok;
+  }
 
   return (
     <div className=" ml-[24px]">
@@ -119,7 +144,7 @@ export default function Communications() {
           />
         </Space>
       </div>
-      <div className=" rounded-t-lg mt-[24px] shadow-2xl">
+      <div className=" rounded-t-lg mt-[24px] shadow-2xl p-6">
         <ConfigProvider
           theme={{
             components: {
@@ -140,9 +165,44 @@ export default function Communications() {
               pageSize: 10,
             }}
             columns={columns}
-            dataSource={communications}
+            dataSource={communications.map((communication) => ({
+              ...communication,
+              key: communication.id,
+            }))}
+            rowSelection={{
+              selectedRowKeys,
+              onChange: (key) => setSelectedRowKeys(key),
+            }}
           />
         </ConfigProvider>
+        {selectedRowKeys.length > 0 && (
+          <button
+            className="px-4 py-2 text-white bg-green-600 rounded"
+            onClick={async () => {
+              setProcessing(true);
+              for (let id of selectedRowKeys) {
+                const done = await handelSendEmail(id);
+                if (done) {
+                  setProcessDone((prev) => prev + 1);
+                }
+              }
+              setProcessing(false);
+              setSelectedRowKeys([]);
+              setProcessDone(0);
+            }}
+          >
+            {processing ? (
+              <div className="flex items-center gap-2">
+                <IoReloadOutline className="animate-spin" />{" "}
+                <span>
+                  {processDone} of {selectedRowKeys.length} Done
+                </span>
+              </div>
+            ) : (
+              "Send Email"
+            )}
+          </button>
+        )}
       </div>
       <Modal
         open={isModalOpen}
@@ -174,8 +234,8 @@ export default function Communications() {
             </div>
             {client?.type === "MESSAGE" && (
               <div className="flex justify-between border-b py-[16px]">
-                <p>Type:</p>
-                <p>{client?.type}</p>
+                <p>Message:</p>
+                <p>{client?.message}</p>
               </div>
             )}
             <div className="flex justify-between border-b py-[16px]">
@@ -204,24 +264,7 @@ export default function Communications() {
               <div className="flex items-center justify-center mt-5">
                 <button
                   className="py-3 px-7 rounded-xl bg-green-600 text-white"
-                  onClick={() => {
-                    fetch(baseURL + "/communications/" + client?.id, {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    })
-                      .then((res) => res.json())
-                      .then((res) => {
-                        Swal.fire({
-                          icon: res.ok ? "success" : "error",
-                          title: res.message,
-                          showConfirmButton: false,
-                          timer: 1500,
-                        });
-                      });
-                  }}
+                  onClick={() => handelSendEmail(client.id)}
                 >
                   Send Email
                 </button>

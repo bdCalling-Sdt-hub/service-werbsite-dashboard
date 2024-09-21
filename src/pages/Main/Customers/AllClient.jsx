@@ -21,6 +21,11 @@ const AllClient = () => {
   const [client, setClient] = useState();
   const [customers, setCustomers] = useState([{}]);
   const [totalData, setTotalData] = useState(0);
+  const [filteredInfo, setFilteredInfo] = useState({
+    name: null,
+    startDate: null,
+    endDate: null,
+  });
 
   const handleView = (value) => {
     setClient(value);
@@ -28,12 +33,21 @@ const AllClient = () => {
   };
 
   const navigate = useNavigate();
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/auth");
     }
-    fetch(baseURL + "/users?type=CUSTOMER&page=" + currentPage, {
+    const url = buildUrl(baseURL + "/users", {
+      type: "CUSTOMER",
+      page: currentPage,
+      name: filteredInfo.name,
+      startDate: filteredInfo.startDate,
+      endDate: filteredInfo.endDate,
+    });
+    
+    fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -57,11 +71,6 @@ const AllClient = () => {
 
   const columns = [
     {
-      title: "ID",
-      dataIndex: "_id",
-      render: (text) => <a>{text}</a>,
-    },
-    {
       title: "First Name",
       dataIndex: "firstName",
     },
@@ -76,6 +85,11 @@ const AllClient = () => {
     {
       title: "Phone Number",
       dataIndex: "mobile",
+    },
+    {
+      title:"status",
+      dataIndex: "isDeleted",
+      render: (status) => status ? "Inactive" : "Active",
     },
     {
       title: "Join Date",
@@ -100,12 +114,6 @@ const AllClient = () => {
 
   const { RangePicker } = DatePicker;
 
-  const [filteredInfo, setFilteredInfo] = useState({
-    name: null,
-    startDate: null,
-    endDate: null,
-  });
-
   function buildUrl(base, params) {
     const query = Object.entries(params)
       .filter(([key, value]) => value !== null && value !== undefined)
@@ -119,25 +127,26 @@ const AllClient = () => {
 
   async function filterData() {
     const params = {
+      type: "CUSTOMER",
       page: currentPage,
       name: filteredInfo.name,
       startDate: filteredInfo.startDate,
       endDate: filteredInfo.endDate,
     };
 
-    const url = buildUrl(baseURL + "/customers", params);
+    const url = buildUrl(baseURL + "/users", params);
 
     const token = localStorage.getItem("token");
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    });
+    })
 
     const data = await response.json();
-    if (data.customers) {
-      if (data.redirect) navigate(data.redirect);
-      setCustomers(data.customers);
+    if (data.ok) {
+      setCustomers(data.data);
+      setTotalData(data.pagination.totalData);
     }
   }
 
@@ -209,7 +218,7 @@ const AllClient = () => {
           <div className="p-[20px] text-white">
             <div className="flex justify-between border-b py-[16px]">
               <p>Customer Name:</p>
-              <p>{client?.name}</p>
+              <p>{client?.firstName + " " + client?.lastName}</p>
             </div>
             <div className="flex justify-between border-b py-[16px] ">
               <p>Email:</p>
@@ -219,13 +228,41 @@ const AllClient = () => {
               <p>Phone number:</p>
               <p>{client?.mobile}</p>
             </div>
-            <div className="flex justify-between border-b py-[16px]">
-              <p> Suburb:</p>
-              <p>{client?.address}</p>
-            </div>
             <div className="flex justify-between py-[16px]">
               <p>Joining date:</p>
               <p>{client?.createdAt?.slice(0, 10)}</p>
+            </div>
+            <div className="flex items-center justify-center mt-5">
+              <button
+                className="py-3 px-7 rounded-xl bg-red-300 text-red-500"
+                onClick={() => {
+                  fetch(baseURL + "/users/" + client.id, {
+                    method: "DELETE",
+                    headers: {
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                  })
+                    .then((res) => res.json())
+                    .then((res) => {
+                      if (res.ok) {
+                        Swal.fire({
+                          icon: "success",
+                          title: "Success",
+                          text: "User deleted successfully",
+                        });
+                        window.location.reload();
+                      } else {
+                        Swal.fire({
+                          icon: "error",
+                          title: "Oops...",
+                          text: "Something went wrong! Please try again later",
+                        });
+                      }
+                    });
+                }}
+              >
+                Delete
+              </button>
             </div>
             {/* <div className="flex items-center justify-center mt-5">
               <button className="py-3 px-7 rounded-xl bg-red-300 text-red-500">
