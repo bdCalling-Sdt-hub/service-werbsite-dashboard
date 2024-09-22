@@ -28,6 +28,7 @@ export default function Report() {
     subscriptionId: "",
   });
   const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(false);
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -84,6 +85,19 @@ export default function Report() {
       });
   }, []);
 
+  function buildUrl(base, params) {
+    const query = Object.entries(params)
+      .filter(
+        ([key, value]) => value !== null && value !== undefined && value !== ""
+      )
+      .map(
+        ([key, value]) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+      )
+      .join("&");
+    return `${base}?${query}`;
+  }
+
   function handelSubmit(e) {
     e.preventDefault();
     setLoading(true);
@@ -92,13 +106,14 @@ export default function Report() {
       navigate("/auth");
     }
 
-    fetch(baseURL + "/businesses/report", {
-      method: "POST",
+    const url = buildUrl(baseURL + "/businesses/report", filteredInfo);
+
+    fetch(url, {
+      method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(filteredInfo),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -236,7 +251,10 @@ export default function Report() {
       ) : (
         <div className=" w-full flex flex-col items-center justify-center">
           <h1 className="text-[30px] font-medium text-start">Search Report</h1>
-          <form className="flex flex-col gap-6 mx-auto mt-8 min-w-[600px] p-6 rounded border border-green-600">
+          <form
+            className="flex flex-col gap-6 mx-auto mt-8 min-w-[600px] p-6 rounded border border-green-600"
+            onSubmit={loading ? null : handelSubmit}
+          >
             <div className="flex flex-col">
               <label htmlFor="search" className="text-[18px] font-medium">
                 Date Range
@@ -467,20 +485,92 @@ export default function Report() {
                 ]}
               />
             </div>
-            <Button
-              type="primary"
-              style={{ width: "200px" }}
-              onClick={loading ? null : handelSubmit}
-            >
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <IoReloadOutline className="animate-spin" />
-                  <span> loading...</span>
-                </div>
-              ) : (
-                "Show Report"
-              )}
-            </Button>
+            <div className="flex items-center justify-between">
+              <Button
+                type="primary"
+                style={{ width: "200px" }}
+                htmlType="submit"
+              >
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <IoReloadOutline className="animate-spin" />
+                    <span> loading...</span>
+                  </div>
+                ) : (
+                  "Show Report"
+                )}
+              </Button>
+              <Button
+                type="primary"
+                style={{ width: "200px" }}
+                onClick={() => {
+                  if (loading2) return;
+                  setLoading2(true);
+                  const token = localStorage.getItem("token");
+                  if (!token) {
+                    navigate("/auth");
+                  }
+
+                  if (
+                    filteredInfo.startDate === "" ||
+                    filteredInfo.endDate === ""
+                  ) {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Oops...",
+                      text: "Please select date range!",
+                    });
+                    return;
+                  }
+
+                  fetch(baseURL + "/businesses/report", {
+                    method: "POST",
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      startDate: filteredInfo.startDate,
+                      endDate: filteredInfo.endDate,
+                    }),
+                  })
+                    .then((res) => res.json())
+                    .then((data) => {
+                      if (data.ok) {
+                        Swal.fire({
+                          icon: "success",
+                          title: data.message,
+                          showConfirmButton: false,
+                          timer: 1500,
+                        });
+                      } else {
+                        Swal.fire({
+                          icon: "error",
+                          title: "Oops...",
+                          text: data.message,
+                        });
+                      }
+                    })
+                    .catch(() => {
+                      Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "Something went wrong!",
+                      });
+                    })
+                    .finally(() => setLoading2(false));
+                }}
+              >
+                {loading2 ? (
+                  <div className="flex items-center gap-2">
+                    <IoReloadOutline className="animate-spin" />
+                    <span> loading...</span>
+                  </div>
+                ) : (
+                  "Send Report To All"
+                )}
+              </Button>
+            </div>
           </form>
         </div>
       )}

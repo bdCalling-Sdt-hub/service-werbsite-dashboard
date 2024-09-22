@@ -152,6 +152,26 @@ const Sidebar = ({ collapsed }) => {
       "9",
       <HiOutlineDocumentReport style={{ fontSize: "24px" }} />
     ),
+    getItem(
+      <p
+        onClick={(e) => navigate("/payment-report")}
+        className="text-[18px] leading-normal"
+      >
+        Payment Report
+      </p>,
+      "90",
+      <HiOutlineDocumentReport style={{ fontSize: "24px" }} />
+    ),
+    // getItem(
+    //   <p
+    //     onClick={(e) => navigate("/communication-report")}
+    //     className="text-[18px] leading-normal"
+    //   >
+    //     Communication Report
+    //   </p>,
+    //   "900",
+    //   <HiOutlineDocumentReport style={{ fontSize: "24px" }} />
+    // ),
 
     getItem(
       <p

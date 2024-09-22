@@ -24,6 +24,8 @@ import Communications from "../pages/Main/Communication/Communications";
 import Notification from "../pages/Main/Notification/Notification.jsx";
 import Review from "../pages/Main/Review/Review.jsx";
 import Report from "../pages/Main/Report/Report.jsx";
+import PaymentReport from "../pages/Main/payment-report/PaymentReport.jsx";
+import CommunicationReport from "../pages/Main/communictionReport/CommunicationReport.jsx";
 
 const router = createBrowserRouter([
   {
@@ -65,6 +67,14 @@ const router = createBrowserRouter([
       {
         path:"/report",
         element:<Report/>
+      },
+      {
+        path:"/payment-report",
+        element:<PaymentReport/>
+      },
+      {
+        path:"/communication-report",
+        element:<CommunicationReport/>
       },
       {
         path: "/communications",
