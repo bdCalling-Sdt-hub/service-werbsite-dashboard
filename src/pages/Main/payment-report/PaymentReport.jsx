@@ -25,7 +25,15 @@ export default function PaymentReport() {
 
   useEffect(() => {
     fetch(`${baseURL}/businesses`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
         setBusinesses(data.data);
       })
@@ -57,7 +65,15 @@ export default function PaymentReport() {
         },
       }
     )
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
         if (data.ok) {
           if (data.data.length === 0) {
@@ -232,7 +248,15 @@ export default function PaymentReport() {
                 value={filteredInfo.businessName}
                 onSearch={(value) => {
                   fetch(`${baseURL}/businesses?name=${value}`)
-                    .then((res) => res.json())
+                    .then((res) => {
+        if (res.status === 401) {
+localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
                     .then((data) => {
                       setBusinesses(data.data);
                     })

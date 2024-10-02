@@ -10,6 +10,10 @@ export default function Categories() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [client, setClient] = useState(null);
+  const [navigatePage, setNavigatePage] = useState({
+    prevPage: null,
+    nextPage: null,
+  });
   const navigate = useNavigate();
 
   const [services, setServices] = useState([]);
@@ -25,10 +29,24 @@ export default function Categories() {
       },
       method: "GET",
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
         if (data.ok) {
           setServices(data.data);
+        }
+        if (data.pagination) {
+          setNavigatePage({
+            prevPage: data?.pagination?.prevPage || null,
+            nextPage: data?.pagination?.nextPage || null,
+          });
         }
       })
       .catch((err) => {
@@ -82,7 +100,15 @@ export default function Categories() {
                     },
                     body: JSON.stringify({ id: service._id }),
                   })
-                    .then((res) => res.json())
+                    .then((res) => {
+                      if (res.status === 401) {
+                        localStorage.removeItem("token");
+                        navigate("/auth");
+                        return;
+                      }
+
+                      return res.json();
+                    })
                     .then((data) => {
                       if (data.ok) {
                         Swal.fire("Success", data.message, "success").then(
@@ -103,6 +129,84 @@ export default function Categories() {
               </button>
             </div>
           ))}
+        </div>
+        <div className="flex items-center justify-between mt-6 text-white px-8">
+          {navigatePage.prevPage && (
+            <button
+              className="px-6 py-2 bg-green-600"
+              onClick={() => {
+                fetch(baseURL + "/services?page=" + navigatePage.prevPage, {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                  method: "GET",
+                })
+                  .then((res) => {
+                    if (res.status === 401) {
+                      localStorage.removeItem("token");
+                      navigate("/auth");
+                      return;
+                    }
+
+                    return res.json();
+                  })
+                  .then((data) => {
+                    if (data.ok) {
+                      setServices(data.data);
+                    }
+                    if (data.pagination) {
+                      setNavigatePage({
+                        prevPage: data?.pagination?.prevPage || null,
+                        nextPage: data?.pagination?.nextPage || null,
+                      });
+                    }
+                  })
+                  .catch((err) => {
+                    Swal.fire("Error", "Something went wrong", "error");
+                  });
+              }}
+            >
+              Prevues
+            </button>
+          )}
+          {navigatePage.nextPage && (
+            <button
+              className="px-6 py-2 bg-green-600"
+              onClick={() => {
+                fetch(baseURL + "/services?page=" + navigatePage.nextPage, {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                  method: "GET",
+                })
+                  .then((res) => {
+                    if (res.status === 401) {
+                      localStorage.removeItem("token");
+                      navigate("/auth");
+                      return;
+                    }
+
+                    return res.json();
+                  })
+                  .then((data) => {
+                    if (data.ok) {
+                      setServices(data.data);
+                    }
+                    if (data.pagination) {
+                      setNavigatePage({
+                        prevPage: data?.pagination?.prevPage || null,
+                        nextPage: data?.pagination?.nextPage || null,
+                      });
+                    }
+                  })
+                  .catch((err) => {
+                    Swal.fire("Error", "Something went wrong", "error");
+                  });
+              }}
+            >
+              Next
+            </button>
+          )}
         </div>
       </div>
       <Modal
@@ -130,7 +234,15 @@ export default function Categories() {
                 },
                 body: data,
               })
-                .then((res) => res.json())
+                .then((res) => {
+                  if (res.status === 401) {
+                    localStorage.removeItem("token");
+                    navigate("/auth");
+                    return;
+                  }
+
+                  return res.json();
+                })
                 .then((data) => {
                   if (data.redirect) navigate(data.redirect);
                   console.log(data);
@@ -196,7 +308,15 @@ export default function Categories() {
                 },
                 body: data,
               })
-                .then((res) => res.json())
+                .then((res) => {
+                  if (res.status === 401) {
+                    localStorage.removeItem("token");
+                    navigate("/auth");
+                    return;
+                  }
+
+                  return res.json();
+                })
                 .then((data) => {
                   if (data.redirect) navigate(data.redirect);
                   console.log(data);
@@ -207,7 +327,8 @@ export default function Categories() {
                   } else {
                     Swal.fire("Error", data.message, "error");
                   }
-                }).catch((err) => {
+                })
+                .catch((err) => {
                   Swal.fire("Error", "Something went wrong", "error");
                 });
             }}

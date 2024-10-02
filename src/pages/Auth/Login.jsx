@@ -19,10 +19,18 @@ const LogIn = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-      }).then((res) => res.json());
+      }).then((res) => {
+        // if (res.status === 401) {
+        //   navigate("/auth");
+        //   return;
+        // }
+
+        return res.json();
+      });
 
       if (res.ok) {
         localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
 
         navigate("/");
       } else {

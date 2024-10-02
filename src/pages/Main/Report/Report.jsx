@@ -1,11 +1,8 @@
 import { DatePicker, Select, Button, Modal, ConfigProvider, Table } from "antd";
-import { UserOutlined, SearchOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { baseURL } from "../../../config";
-import { BsInfoCircle } from "react-icons/bs";
 import Swal from "sweetalert2";
-import { data } from "autoprefixer";
 import { IoReloadOutline } from "react-icons/io5";
 import Papa from "papaparse";
 
@@ -33,9 +30,19 @@ export default function Report() {
 
   useEffect(() => {
     fetch(`${baseURL}/businesses`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
-        setBusinesses(data.data);
+        if (data.ok) {
+          setBusinesses(data.data);
+        }
       })
       .catch((err) => {
         Swal.fire({
@@ -46,9 +53,19 @@ export default function Report() {
       });
 
     fetch(`${baseURL}/services`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
-        setBusinessCategories(data.data);
+        if (data.ok) {
+          setBusinessCategories(data.data);
+        }
       })
       .catch((err) => {
         Swal.fire({
@@ -59,9 +76,19 @@ export default function Report() {
       });
 
     fetch(`${baseURL}/suburbs`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
-        setSuburbs(data.data);
+        if(data.ok) {
+          setSuburbs(data.data);
+        }
       })
       .catch((err) => {
         Swal.fire({
@@ -72,9 +99,19 @@ export default function Report() {
       });
 
     fetch(`${baseURL}/subscriptions`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
-        setPlans(data.data);
+        if (data.ok) {
+          setPlans(data.data);
+        }
       })
       .catch((err) => {
         Swal.fire({
@@ -115,7 +152,15 @@ export default function Report() {
         "Content-Type": "application/json",
       },
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
         if (data.ok) {
           if (data.data.length === 0) {
@@ -302,7 +347,15 @@ export default function Report() {
                 value={filteredInfo.businessName}
                 onSearch={(value) => {
                   fetch(`${baseURL}/businesses?name=${value}`)
-                    .then((res) => res.json())
+                    .then((res) => {
+                      if (res.status === 401) {
+                        localStorage.removeItem("token");
+                        navigate("/auth");
+                        return;
+                      }
+
+                      return res.json();
+                    })
                     .then((data) => {
                       setBusinesses(data.data);
                     })
@@ -344,9 +397,19 @@ export default function Report() {
                 filterOption={false}
                 onSearch={(value) => {
                   fetch(`${baseURL}/services?name=${value}`)
-                    .then((res) => res.json())
+                    .then((res) => {
+                      if (res.status === 401) {
+                        localStorage.removeItem("token");
+                        navigate("/auth");
+                        return;
+                      }
+
+                      return res.json();
+                    })
                     .then((data) => {
-                      setBusinessCategories(data.data);
+                      if(data.ok) {
+                        setBusinessCategories(data.data);
+                      }
                     })
                     .catch(() => {
                       Swal.fire({
@@ -386,9 +449,19 @@ export default function Report() {
                 filterOption={false}
                 onSearch={(value) => {
                   fetch(`${baseURL}/suburbs?name=${value}`)
-                    .then((res) => res.json())
+                    .then((res) => {
+                      if (res.status === 401) {
+                        localStorage.removeItem("token");
+                        navigate("/auth");
+                        return;
+                      }
+
+                      return res.json();
+                    })
                     .then((data) => {
-                      setSuburbs(data.data);
+                      if(data.ok) {
+                        setSuburbs(data.data);
+                      }
                     })
                     .catch(() => {
                       Swal.fire({
@@ -534,7 +607,15 @@ export default function Report() {
                       endDate: filteredInfo.endDate,
                     }),
                   })
-                    .then((res) => res.json())
+                    .then((res) => {
+                      if (res.status === 401) {
+                        localStorage.removeItem("token");
+                        navigate("/auth");
+                        return;
+                      }
+
+                      return res.json();
+                    })
                     .then((data) => {
                       if (data.ok) {
                         Swal.fire({

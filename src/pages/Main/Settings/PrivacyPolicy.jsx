@@ -18,7 +18,15 @@ const PrivacyPolicy = () => {
       },
       method: "GET",
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
         setPrivacyPolicy(data.siteData.privacyPolicy);
       });

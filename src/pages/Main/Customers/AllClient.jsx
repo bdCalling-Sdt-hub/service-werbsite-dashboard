@@ -19,7 +19,7 @@ const AllClient = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [client, setClient] = useState();
-  const [customers, setCustomers] = useState([{}]);
+  const [customers, setCustomers] = useState([]);
   const [totalData, setTotalData] = useState(0);
   const [filteredInfo, setFilteredInfo] = useState({
     name: null,
@@ -53,7 +53,15 @@ const AllClient = () => {
       },
       method: "GET",
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
         if (data.ok) {
           setCustomers(data.data);
@@ -242,7 +250,15 @@ const AllClient = () => {
                       Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
                   })
-                    .then((res) => res.json())
+                    .then((res) => {
+        if (res.status === 401) {
+localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
                     .then((res) => {
                       if (res.ok) {
                         Swal.fire({

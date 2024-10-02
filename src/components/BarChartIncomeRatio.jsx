@@ -1,12 +1,6 @@
 import { DatePicker } from "antd";
 import { useEffect, useState } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { baseURL } from "../config";
 import { useNavigate } from "react-router-dom";
 
@@ -25,10 +19,23 @@ const BarChartIncomeRatio = () => {
       },
       method: "GET",
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
-        if(data.ok) {
-          setData(data.data.map(({ month, totalAmount }) => ({ name: month, uv: totalAmount })));
+        if (data.ok) {
+          setData(
+            data.data.map(({ month, totalAmount }) => ({
+              name: month,
+              uv: totalAmount,
+            }))
+          );
         }
       });
   }, [navigate]);
@@ -40,10 +47,23 @@ const BarChartIncomeRatio = () => {
       },
       method: "GET",
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
-        if(data.ok) {
-          setData(data.data.map(({ month, totalAmount }) => ({ name: month, uv: totalAmount })));
+        if (data.ok) {
+          setData(
+            data.data.map(({ month, totalAmount }) => ({
+              name: month,
+              uv: totalAmount,
+            }))
+          );
         }
       });
   };

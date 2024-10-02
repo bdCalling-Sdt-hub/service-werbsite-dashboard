@@ -10,6 +10,10 @@ import { FaMinus } from "react-icons/fa6";
 export default function Subscriptions() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [navigatePage, setNavigatePage] = useState({
+    prevPage: null,
+    nextPage: null,
+  });
   const [client, setClient] = useState(null);
   const navigate = useNavigate();
 
@@ -33,10 +37,24 @@ export default function Subscriptions() {
       },
       method: "GET",
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
         if (data.ok) {
           setSubscriptions(data.data);
+        }
+        if (data.pagination) {
+          setNavigatePage({
+            prevPage: data?.pagination?.prevPage || null,
+            nextPage: data?.pagination?.nextPage || null,
+          });
         }
       });
   }, [navigate]);
@@ -66,70 +84,156 @@ export default function Subscriptions() {
                 ))}
               </ul>
               <div className="mt-auto w-full flex flex-col gap-2">
-              <p className="text-black-200">
-                <span className="text-3xl font-bold text-black-500">
-                  ${subscription.price}
-                </span>
-                /month
-              </p>
-              <button
-                className="py-2 w-full bg-green-500 text-white rounded-xl"
-                onClick={() => {
-                  setClient(subscription);
-                  setIsEditModalOpen(true);
-                }}
-              >
-                Edit
-              </button>
+                <p className="text-black-200">
+                  <span className="text-3xl font-bold text-black-500">
+                    ${subscription.price}
+                  </span>
+                  /month
+                </p>
+                <button
+                  className="py-2 w-full bg-green-500 text-white rounded-xl"
+                  onClick={() => {
+                    setClient(subscription);
+                    setIsEditModalOpen(true);
+                  }}
+                >
+                  Edit
+                </button>
 
-              <button
-                className="py-2 w-full bg-red-500 text-white rounded-xl"
-                onClick={() => {
-                  Swal.fire({
-                    title: "Are you sure?",
-                    text: "You won't be able to revert this!",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, delete it!",
-                  }).then((result) => {
-                    if (result.isConfirmed) {
-                      fetch(baseURL + "/subscriptions/" + subscription.id, {
-                        headers: {
-                          Authorization: `Bearer ${localStorage.getItem(
-                            "token"
-                          )}`,
-                          "Content-Type": "application/json",
-                        },
-                        method: "DELETE",
-                        body: JSON.stringify({
-                          id: subscription._id,
-                        }),
-                      })
-                        .then((res) => res.json())
-                        .then((data) => {
-                          if (data.ok) {
-                            Swal.fire(
-                              "Deleted!",
-                              "Your file has been deleted.",
-                              "success"
-                            ).then((result) => {
-                              if (result.isConfirmed) {
-                                window.location.reload();
-                              }
-                            });
-                          }
-                        });
-                    }
-                  });
-                }}
-              >
-                Delete
-              </button>
+                <button
+                  className="py-2 w-full bg-red-500 text-white rounded-xl"
+                  onClick={() => {
+                    Swal.fire({
+                      title: "Are you sure?",
+                      text: "You won't be able to revert this!",
+                      icon: "warning",
+                      showCancelButton: true,
+                      confirmButtonColor: "#3085d6",
+                      cancelButtonColor: "#d33",
+                      confirmButtonText: "Yes, delete it!",
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        fetch(baseURL + "/subscriptions/" + subscription.id, {
+                          headers: {
+                            Authorization: `Bearer ${localStorage.getItem(
+                              "token"
+                            )}`,
+                            "Content-Type": "application/json",
+                          },
+                          method: "DELETE",
+                          body: JSON.stringify({
+                            id: subscription._id,
+                          }),
+                        })
+                          .then((res) => {
+                            if (res.status === 401) {
+                              localStorage.removeItem("token");
+                              navigate("/auth");
+                              return;
+                            }
+
+                            return res.json();
+                          })
+                          .then((data) => {
+                            if (data.ok) {
+                              Swal.fire(
+                                "Deleted!",
+                                "Your file has been deleted.",
+                                "success"
+                              ).then((result) => {
+                                if (result.isConfirmed) {
+                                  window.location.reload();
+                                }
+                              });
+                            }
+                          });
+                      }
+                    });
+                  }}
+                >
+                  Delete
+                </button>
               </div>
             </div>
           ))}
+        </div>
+        <div className="flex items-center justify-between mt-6 text-white px-8">
+          {navigatePage.prevPage && (
+            <button
+              className="px-6 py-2 bg-green-600"
+              onClick={() => {
+                fetch(baseURL + "/subscriptions?page=" + navigatePage.prevPage, {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                  method: "GET",
+                })
+                  .then((res) => {
+                    if (res.status === 401) {
+                      localStorage.removeItem("token");
+                      navigate("/auth");
+                      return;
+                    }
+
+                    return res.json();
+                  })
+                  .then((data) => {
+                    if (data.ok) {
+                      setSubscriptions(data.data);
+                    }
+                    if (data.pagination) {
+                      setNavigatePage({
+                        prevPage: data?.pagination?.prevPage || null,
+                        nextPage: data?.pagination?.nextPage || null,
+                      });
+                    }
+                  })
+                  .catch((err) => {
+                    Swal.fire("Error", "Something went wrong", "error");
+                  });
+              }}
+            >
+              Prevues
+            </button>
+          )}
+          {navigatePage.nextPage && (
+            <button
+              className="px-6 py-2 bg-green-600"
+              onClick={() => {
+                fetch(baseURL + "/subscriptions?page=" + navigatePage.nextPage, {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                  method: "GET",
+                })
+                  .then((res) => {
+                    if (res.status === 401) {
+                      localStorage.removeItem("token");
+                      navigate("/auth");
+                      return;
+                    }
+
+                    return res.json();
+                  })
+                  .then((data) => {
+                    if (data.ok) {
+                      setSubscriptions(data.data);
+                    }
+                    if (data.pagination) {
+                      setNavigatePage({
+                        prevPage: data?.pagination?.prevPage || null,
+                        nextPage: data?.pagination?.nextPage || null,
+                      });
+                    }
+                  })
+                  .catch((err) => {
+                    Swal.fire("Error", "Something went wrong", "error");
+                  });
+              }}
+            >
+              Next
+            </button>
+          )}
         </div>
       </div>
       <Modal
@@ -160,7 +264,15 @@ export default function Subscriptions() {
                     : Number(newSubscription.minimumStart),
                 }),
               })
-                .then((res) => res.json())
+                .then((res) => {
+                  if (res.status === 401) {
+                    localStorage.removeItem("token");
+                    navigate("/auth");
+                    return;
+                  }
+
+                  return res.json();
+                })
                 .then((data) => {
                   if (data.ok) {
                     Swal.fire({
@@ -286,7 +398,7 @@ export default function Subscriptions() {
             className="p-[20px] text-white flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              fetch(baseURL + "/subscriptions/"+client.id, {
+              fetch(baseURL + "/subscriptions/" + client.id, {
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem("token")}`,
                   "Content-Type": "application/json",
@@ -294,7 +406,15 @@ export default function Subscriptions() {
                 method: "PUT",
                 body: JSON.stringify(client),
               })
-                .then((res) => res.json())
+                .then((res) => {
+                  if (res.status === 401) {
+                    localStorage.removeItem("token");
+                    navigate("/auth");
+                    return;
+                  }
+
+                  return res.json();
+                })
                 .then((data) => {
                   if (data.ok) {
                     Swal.fire({

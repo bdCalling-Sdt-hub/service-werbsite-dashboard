@@ -17,7 +17,14 @@ const ForgotPassword = () => {
       method: "POST",
       body: formData,
     }
-    ).then((res) => res.json())
+    ).then((res) => {
+      if (res.status === 401) {
+        navigate("/auth");
+        return;
+      }
+
+      return res.json();
+    })
     .then((data) => {
       if(data.ok) {navigate("/auth/verify");}else{
         Swal.fire({

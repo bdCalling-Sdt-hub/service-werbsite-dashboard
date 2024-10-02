@@ -20,9 +20,17 @@ const DashboardHome = () => {
       },
       method: "GET",
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
-        if(data.ok) {
+        if (data.ok) {
           setCustomers(data.data);
         }
       });
@@ -39,11 +47,13 @@ const DashboardHome = () => {
           {customers.map((customer) => (
             <div className="flex items-center gap-2" key={customer.id}>
               <img
-                src={customer.image?baseURL+"/"+customer.image:"/user.png"}
-                alt={customer.firstName+" "+customer.lastName}
+                src={
+                  customer.image ? baseURL + "/" + customer.image : "/user.png"
+                }
+                alt={customer.firstName + " " + customer.lastName}
                 className="w-10 h-10 rounded-full"
               />
-              <p>{customer.firstName+" "+customer.lastName}</p>
+              <p>{customer.firstName + " " + customer.lastName}</p>
             </div>
           ))}
         </div>

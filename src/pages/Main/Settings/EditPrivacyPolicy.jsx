@@ -22,7 +22,15 @@ const EditPrivacyPolicy = () => {
       },
       method: "GET",
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
         setContent(data.siteData.privacyPolicy);
       });
@@ -39,7 +47,15 @@ const EditPrivacyPolicy = () => {
         privacyPolicy: content,
       }),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
         if (data.ok) {
           Swal.fire("Success", "Privacy Policy Updated", "success");

@@ -22,7 +22,15 @@ const EditTramsAndCondition = () => {
       },
       method: "GET",
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
         setContent(data.siteData.termsAndConditions);
       });
@@ -39,7 +47,15 @@ const EditTramsAndCondition = () => {
         termsAndConditions: content,
       }),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 401) {
+localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
       .then((data) => {
         console.log(data);
         if (data.ok)
