@@ -64,15 +64,15 @@ export default function Categories() {
         <MdAdd /> Add Services
       </button>
       <div className=" rounded-t-lg mt-[24px] shadow-2xl p-5">
-        <div className="grid grid-cols-4 gap-6 mt-8">
+        <div className="grid grid-cols-7 gap-6 mt-8">
           {services.map((service) => (
             <div
               key={service._id}
               className=" bg-[#E6F3EC] border border-[#058240] rounded-t-xl"
             >
-              <div className="py-4 px-3">
+              <div className="p-2">
                 <button
-                  className="w-12 h-12 flex items-center justify-center rounded-full bg-[#B2D8C4] ml-auto"
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-[#B2D8C4] ml-auto"
                   onClick={() => {
                     setIsEditModalOpen(true);
                     setClient(service);
@@ -163,7 +163,7 @@ export default function Categories() {
                   })
                   .catch((err) => {
                     Swal.fire("Error", "Something went wrong", "error");
-                  });
+                  });  
               }}
             >
               Prevues

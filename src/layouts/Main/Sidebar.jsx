@@ -117,7 +117,7 @@ const Sidebar = ({ collapsed }) => {
         onClick={(e) => navigate("/subscriptions")}
         className="text-[18px] leading-normal"
       >
-        Subscriptions
+        Plans
       </p>,
       "6",
       <FaRegCopy style={{ fontSize: "24px" }} />

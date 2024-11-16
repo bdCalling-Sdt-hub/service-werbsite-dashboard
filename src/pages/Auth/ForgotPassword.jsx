@@ -4,7 +4,7 @@ import { baseURL } from "../../config";
 import { HiOutlineMailOpen } from "react-icons/hi";
 import { Link, useNavigate } from "react-router-dom";
 import resetPassword from "../../assets/forgotImg.png";
-import logo from "../../assets/logo2.png";
+import logo from "../../assets/logo.png";
 import { GoArrowLeft } from "react-icons/go";
 import Swal from "sweetalert2";
 

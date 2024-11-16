@@ -32,7 +32,7 @@ const Earnings = () => {
     })
       .then((res) => {
         if (res.status === 401) {
-localStorage.removeItem("token");
+          localStorage.removeItem("token");
           navigate("/auth");
           return;
         }

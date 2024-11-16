@@ -4,7 +4,7 @@ import { HiOutlineMailOpen } from "react-icons/hi";
 import { Link, useNavigate } from "react-router-dom";
 
 import loginImg from "../../assets/Isometric.png";
-import logo from "../../assets/logo2.png";
+import logo from "../../assets/logo.png";
 import { IconLock } from "@tabler/icons-react";
 import { baseURL } from "../../config";
 import Swal from "sweetalert2";
