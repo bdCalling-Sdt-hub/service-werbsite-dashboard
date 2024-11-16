@@ -255,6 +255,10 @@ localStorage.removeItem("token");
               </div>
             )}
             <div className="flex justify-between border-b py-[16px]">
+              <p>Email:</p>
+              <p>{client?.user.email}</p>
+            </div>
+            <div className="flex justify-between border-b py-[16px]">
               <p>Date:</p>
               <p>{client?.createdAt?.slice(0, 10)}</p>
             </div>
