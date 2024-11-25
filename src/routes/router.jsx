@@ -26,6 +26,7 @@ import Review from "../pages/Main/Review/Review.jsx";
 import Report from "../pages/Main/Report/Report.jsx";
 import PaymentReport from "../pages/Main/payment-report/PaymentReport.jsx";
 import CommunicationReport from "../pages/Main/communictionReport/CommunicationReport.jsx";
+import Promotions from "../pages/Main/Promotions/Promotions";
 
 const router = createBrowserRouter([
   {
@@ -33,8 +34,8 @@ const router = createBrowserRouter([
     element: <Main />,
     children: [
       {
-        path:"/notification",
-        element:<Notification/>
+        path: "/notification",
+        element: <Notification />,
       },
       {
         path: "/",
@@ -65,20 +66,24 @@ const router = createBrowserRouter([
         element: <Review />,
       },
       {
-        path:"/report",
-        element:<Report/>
+        path: "/report",
+        element: <Report />,
       },
       {
-        path:"/payment-report",
-        element:<PaymentReport/>
+        path: "/payment-report",
+        element: <PaymentReport />,
       },
       {
-        path:"/communication-report",
-        element:<CommunicationReport/>
+        path: "/communication-report",
+        element: <CommunicationReport />,
       },
       {
         path: "/communications",
         element: <Communications />,
+      },
+      {
+        path: "/promotions",
+        element: <Promotions />,
       },
       {
         path: "/profile-information",

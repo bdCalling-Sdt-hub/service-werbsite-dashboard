@@ -7,26 +7,25 @@ import PhoneInput from "react-phone-number-input";
 import { useNavigate } from "react-router-dom";
 import img from "../../../assets/dami.jpg";
 
-
 const ProfileInformation = () => {
-    const [currentUser,setCurrentUser] = useState()
+  const [currentUser, setCurrentUser] = useState();
   const navigate = useNavigate();
   const baseUrl = import.meta.env.VITE_API_URL;
-  useEffect(()=>{
-    const storedUser = localStorage.getItem('user-update');
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user-update");
     const user = JSON.parse(storedUser);
     console.log(user);
     setCurrentUser(user);
-  },[])
+  }, []);
   console.log(currentUser);
-    return (
-        <div className="ml-[24px]">
+  return (
+    <div className="ml-[24px]">
       <div className="flex justify-between items-center mt-[40px] mb-[63px]">
         <h1 className="text-[30px] font-medium">Personal Information</h1>
         <div
-            // onClick={
-            //     (e) =>navigate(`/edit-profile/${currentUser?.id}`)}
-            onClick={(e)=>navigate('/edit-profile-information')}
+          // onClick={
+          //     (e) =>navigate(`/edit-profile/${currentUser?.id}`)}
+          onClick={(e) => navigate("/edit-profile-information")}
           className="flex gap-2 items-center py-[15px]
                  px-[40px]
                   bg-[#318130]
@@ -49,11 +48,11 @@ const ProfileInformation = () => {
           />
           <div className="flex flex-col justify-center items-center">
             <p className="text-[20px] text-[#4E4E4E]">
-                {/* {currentUser?.role.toUpperCase()} */}
-                ADMIN
-                </p>
+              {/* {currentUser?.role.toUpperCase()} */}
+              ADMIN
+            </p>
             <h1 className="text-[#222222] text-[30px] font-medium">
-             {/* {currentUser?.name.toUpperCase()} */} Ahad Hossain
+              {/* {currentUser?.name.toUpperCase()} */} Ahad Hossain
             </h1>
           </div>
         </div>
@@ -69,7 +68,6 @@ const ProfileInformation = () => {
                   Name
                 </label>
                 <Input
-              
                   placeholder="First name"
                   value={currentUser?.name}
                   className="p-4 bg-[#F7F7F7]
@@ -83,7 +81,6 @@ const ProfileInformation = () => {
                   readOnly
                 />
               </div>
-              
             </div>
             <div className="flex-1">
               <label
@@ -93,7 +90,6 @@ const ProfileInformation = () => {
                 Email
               </label>
               <Input
-          
                 placeholder="Email"
                 value={currentUser?.email}
                 className="p-4 bg-[#F7F7F7]
@@ -115,7 +111,6 @@ const ProfileInformation = () => {
                 Phone Number
               </label>
               <Input
-            
                 placeholder="Phone Number"
                 value={currentUser?.phoneNumber}
                 className="p-4 bg-[#F7F7F7]
@@ -148,14 +143,13 @@ const ProfileInformation = () => {
                 items-center 
                 gap-4 inline-flex outline-none focus:border-none focus:bg-[#F7F7F7] hover:bg-[#F7F7F7]"
                 prefix={<CiCalendarDate size={20} />}
-               
               />
             </div>
           </div>
         </div>
       </div>
     </div>
-    );
-}
+  );
+};
 
 export default ProfileInformation;

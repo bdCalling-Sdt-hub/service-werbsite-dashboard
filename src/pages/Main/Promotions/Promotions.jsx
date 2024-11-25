@@ -1,20 +1,20 @@
+import { useEffect, useState } from "react";
 import {
   ConfigProvider,
   DatePicker,
-  Space,
   Table,
   Input,
   Button,
   Modal,
+  Space,
 } from "antd";
-import { UserOutlined, SearchOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { baseURL } from "../../../config";
 import { BsInfoCircle } from "react-icons/bs";
+import { UserOutlined, SearchOutlined } from "@ant-design/icons";
 import Swal from "sweetalert2";
 
-export default function Review() {
+export default function Promotions() {
   const { RangePicker } = DatePicker;
   const [communications, setCommunications] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,7 +29,7 @@ export default function Review() {
     if (!token) {
       navigate("/auth");
     }
-    fetch(baseURL + "/reviews/all?page=" + currentPage, {
+    fetch(baseURL + "/promotions/all?page=" + currentPage, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -58,52 +58,87 @@ export default function Review() {
       render: (_, __, index) => index + 1,
     },
     {
-      title: "Customer Name",
-      dataIndex: "user",
-      render: (user) =>
-        user ? user.firstName + " " + user.lastName : "Guest User",
-    },
-    {
       title: "Business Name",
       dataIndex: "business",
       render: (business) => business?.name ?? "",
     },
     {
-      title: "Rating",
-      dataIndex: "rating",
+      title: "title",
+      dataIndex: "title",
     },
     {
-      title: "Date",
-      dataIndex: "createdAt",
-      render: (text) => text?.slice(0, 10),
+      title: "Discount",
+      dataIndex: "discount",
+      render: (text) => text + "%",
     },
     {
-      title: "Time",
+      title: "Start Date",
+      dataIndex: "startAt",
+      render: (date) => new Date(date).toDateString(),
+    },
+    {
+      title: "End Date",
+      dataIndex: "endAt",
+      render: (date) => new Date(date).toDateString(),
+    },
+    {
+      title: "Apply Date",
       dataIndex: "createdAt",
-      render: (text) => text?.slice(11, 19),
+      render: (date) => new Date(date).toDateString(),
     },
     {
       title: "Action",
       render: (_, record) => (
-        <Space size="middle">
-          <BsInfoCircle
-            onClick={() => {
-              setClient(record);
-              setIsModalOpen(true);
-            }}
-            size={18}
-            className="text-[#318130] cursor-pointer"
-          />
-        </Space>
+        <Button
+          onClick={() => {
+            approve(record.id);
+          }}
+          className="bg-green-500 text-white"
+        >
+          Approve
+        </Button>
       ),
     },
   ];
 
+  async function approve(id) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/auth");
+    }
+    fetch(baseURL + "/promotions/" + id, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      method: "PATCH",
+    })
+      .then((res) => {
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/auth");
+          return;
+        }
+
+        return res.json();
+      })
+      .then((data) => {
+        if (data.ok) {
+          Swal.fire({
+            icon: "success",
+            title: "Promotion Approved",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setCommunications(communications.filter((com) => com.id !== id));
+        }
+      });
+  }
+
   return (
     <div className=" ml-[24px]">
       <div className=" flex justify-between items-center">
-        <h1 className="text-[30px] font-medium">Reviews List</h1>
-        <Space size={20}>
+        <h1 className="text-[30px] font-medium">Pending promotions</h1>
+        {/* <Space size={20}>
           <RangePicker
           // onChange={(_, dateString) =>
           //   setFilteredInfo({
@@ -126,7 +161,7 @@ export default function Review() {
             icon={<SearchOutlined />}
             // onClick={filterData}
           />
-        </Space>
+        </Space> */}
       </div>
       <div className=" rounded-t-lg mt-[24px] shadow-2xl">
         <ConfigProvider

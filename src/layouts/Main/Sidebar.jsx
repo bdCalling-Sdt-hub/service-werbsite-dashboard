@@ -1,18 +1,8 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { BiSolidDashboard } from "react-icons/bi";
-import { HiOutlineUsers } from "react-icons/hi";
-import { BsCalendar2, BsDot } from "react-icons/bs";
-import { BiDollarCircle } from "react-icons/bi";
 import { CiSettings } from "react-icons/ci";
-import { HiLogout } from "react-icons/hi";
-import { TbLogout2, TbTargetArrow } from "react-icons/tb";
-import { FaCalendarDays, FaHandHoldingMedical } from "react-icons/fa6";
 import { FaUsers } from "react-icons/fa";
-import { FaRegClipboard } from "react-icons/fa6";
-import { FaClipboardCheck } from "react-icons/fa";
-import { RiArrowRightSLine } from "react-icons/ri";
-import { IoIosArrowForward } from "react-icons/io";
 import { MdLogout } from "react-icons/md";
 import { Menu } from "antd";
 import { useState } from "react";
@@ -140,6 +130,16 @@ const Sidebar = ({ collapsed }) => {
         Reviews
       </p>,
       "8",
+      <MdReviews style={{ fontSize: "24px" }} />
+    ),
+    getItem(
+      <p
+        onClick={(e) => navigate("/promotions")}    
+        className="text-[18px] leading-normal"
+      >
+        Promotions
+      </p>,
+      "454",
       <MdReviews style={{ fontSize: "24px" }} />
     ),
     getItem(

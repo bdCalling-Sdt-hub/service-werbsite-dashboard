@@ -38,7 +38,7 @@ export default function Communications() {
     })
       .then((res) => {
         if (res.status === 401) {
-localStorage.removeItem("token");
+          localStorage.removeItem("token");
           navigate("/auth");
           return;
         }
@@ -112,14 +112,14 @@ localStorage.removeItem("token");
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     }).then((res) => {
-        if (res.status === 401) {
-localStorage.removeItem("token");
-          navigate("/auth");
-          return;
-        }
+      if (res.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/auth");
+        return;
+      }
 
-        return res.json();
-      });
+      return res.json();
+    });
 
     Swal.fire({
       icon: res.ok ? "success" : "error",
