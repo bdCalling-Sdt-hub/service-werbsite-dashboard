@@ -27,6 +27,7 @@ import Report from "../pages/Main/Report/Report.jsx";
 import PaymentReport from "../pages/Main/payment-report/PaymentReport.jsx";
 import CommunicationReport from "../pages/Main/communictionReport/CommunicationReport.jsx";
 import Promotions from "../pages/Main/Promotions/Promotions";
+import Referrals from "../pages/Main/Referrals/Referrals.jsx";
 
 const router = createBrowserRouter([
   {
@@ -84,6 +85,10 @@ const router = createBrowserRouter([
       {
         path: "/promotions",
         element: <Promotions />,
+      },
+      {
+        path: "/referrals",
+        element: <Referrals />,
       },
       {
         path: "/profile-information",

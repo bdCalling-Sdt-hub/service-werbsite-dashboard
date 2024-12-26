@@ -21,13 +21,13 @@ export default function PaymentReport() {
   });
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
-  const [totalAmount,setTotalAmount] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
 
   useEffect(() => {
     fetch(`${baseURL}/businesses`)
       .then((res) => {
         if (res.status === 401) {
-localStorage.removeItem("token");
+          localStorage.removeItem("token");
           navigate("/auth");
           return;
         }
@@ -67,7 +67,7 @@ localStorage.removeItem("token");
     )
       .then((res) => {
         if (res.status === 401) {
-localStorage.removeItem("token");
+          localStorage.removeItem("token");
           navigate("/auth");
           return;
         }
@@ -76,7 +76,7 @@ localStorage.removeItem("token");
       })
       .then((data) => {
         if (data.ok) {
-          if (data.data.length === 0) {
+          if (data.data.payments.length === 0) {
             Swal.fire({
               icon: "info",
               title: "No Data Found",
@@ -150,7 +150,9 @@ localStorage.removeItem("token");
             }}
           >
             <Table pagination={false} columns={columns} dataSource={data} />
-            <div className="text-right mr-36 text-lg font-medium">Total ${totalAmount}</div>
+            <div className="text-right mr-36 text-lg font-medium">
+              Total ${totalAmount}
+            </div>
           </ConfigProvider>
 
           <div className="flex items-center justify-between mt-8">
@@ -249,14 +251,14 @@ localStorage.removeItem("token");
                 onSearch={(value) => {
                   fetch(`${baseURL}/businesses?name=${value}`)
                     .then((res) => {
-        if (res.status === 401) {
-localStorage.removeItem("token");
-          navigate("/auth");
-          return;
-        }
+                      if (res.status === 401) {
+                        localStorage.removeItem("token");
+                        navigate("/auth");
+                        return;
+                      }
 
-        return res.json();
-      })
+                      return res.json();
+                    })
                     .then((data) => {
                       setBusinesses(data.data);
                     })

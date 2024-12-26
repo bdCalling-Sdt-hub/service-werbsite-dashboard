@@ -16,6 +16,8 @@ import { MdOutlineDesignServices } from "react-icons/md";
 import { FaComments } from "react-icons/fa";
 import { MdReviews } from "react-icons/md";
 import { HiOutlineDocumentReport } from "react-icons/hi";
+import { TiUserAdd } from "react-icons/ti";
+import { FaBullhorn } from "react-icons/fa";
 
 function getItem(label, key, icon, children) {
   return {
@@ -124,7 +126,7 @@ const Sidebar = ({ collapsed }) => {
     ),
     getItem(
       <p
-        onClick={(e) => navigate("/reviews")}    
+        onClick={(e) => navigate("/reviews")}
         className="text-[18px] leading-normal"
       >
         Reviews
@@ -134,13 +136,23 @@ const Sidebar = ({ collapsed }) => {
     ),
     getItem(
       <p
-        onClick={(e) => navigate("/promotions")}    
+        onClick={(e) => navigate("/referrals")}
+        className="text-[18px] leading-normal"
+      >
+        Referrals
+      </p>,
+      "884",
+      <TiUserAdd style={{ fontSize: "24px" }} />
+    ),
+    getItem(
+      <p
+        onClick={(e) => navigate("/promotions")}
         className="text-[18px] leading-normal"
       >
         Promotions
       </p>,
       "454",
-      <MdReviews style={{ fontSize: "24px" }} />
+      <FaBullhorn style={{ fontSize: "24px" }} />
     ),
     getItem(
       <p
