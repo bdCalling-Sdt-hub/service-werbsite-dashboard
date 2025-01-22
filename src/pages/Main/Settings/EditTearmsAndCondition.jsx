@@ -16,7 +16,7 @@ const EditTramsAndCondition = () => {
     if (!token) {
       navigate("/auth");
     }
-    fetch(baseURL + "/sitedata", {
+    fetch(baseURL + "/app-data", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -32,19 +32,19 @@ localStorage.removeItem("token");
         return res.json();
       })
       .then((data) => {
-        setContent(data.siteData.termsAndConditions);
+        setContent(data.siteData.terms);
       });
   }, [navigate]);
 
   const handleUpdate = () => {
-    fetch(baseURL + "/sitedata", {
+    fetch(baseURL + "/app-data", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
       },
       method: "PUT",
       body: JSON.stringify({
-        termsAndConditions: content,
+        terms: content,
       }),
     })
       .then((res) => {

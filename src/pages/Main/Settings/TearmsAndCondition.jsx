@@ -12,7 +12,7 @@ const TearmsAndCondition = () => {
     if (!token) {
       navigate("/auth");
     }
-    fetch(baseURL + "/sitedata", {
+    fetch(baseURL + "/app-data", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -28,7 +28,7 @@ localStorage.removeItem("token");
         return res.json();
       })
       .then((data) => {
-        setTermsAndConditions(data.siteData.termsAndConditions);
+        setTermsAndConditions(data.siteData.terms);
       });
   }, [navigate]);
   return (

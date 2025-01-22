@@ -12,7 +12,7 @@ const PrivacyPolicy = () => {
     if (!token) {
       navigate("/auth");
     }
-    fetch(baseURL + "/sitedata", {
+    fetch(baseURL + "/app-data", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -28,7 +28,7 @@ localStorage.removeItem("token");
         return res.json();
       })
       .then((data) => {
-        setPrivacyPolicy(data.siteData.privacyPolicy);
+        setPrivacyPolicy(data.siteData.privacy);
       });
   }, [navigate]);
 

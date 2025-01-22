@@ -16,7 +16,7 @@ const EditAboutUs = () => {
     if (!token) {
       navigate("/auth");
     }
-    fetch(baseURL + "/sitedata", {
+    fetch(baseURL + "/app-data", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -32,19 +32,19 @@ const EditAboutUs = () => {
         return res.json();
       })
       .then((data) => {
-        setContent(data.siteData.aboutUs);
+        setContent(data.siteData.about);
       });
   }, [navigate]);
 
   const handleUpdate = () => {
-    fetch(baseURL + "/sitedata", {
+    fetch(baseURL + "/app-data", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
       },
       method: "PUT",
       body: JSON.stringify({
-        aboutUs: content,
+        about: content,
       }),
     })
       .then((res) => {
