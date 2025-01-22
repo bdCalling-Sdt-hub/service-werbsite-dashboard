@@ -28,7 +28,7 @@ localStorage.removeItem("token");
         return res.json();
       })
       .then((data) => {
-        setPrivacyPolicy(data.siteData.privacy);
+        setPrivacyPolicy(data.data.privacy);
       });
   }, [navigate]);
 

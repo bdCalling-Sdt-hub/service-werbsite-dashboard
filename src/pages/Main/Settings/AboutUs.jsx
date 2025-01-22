@@ -28,7 +28,7 @@ const AboutUs = () => {
         return res.json();
       })
       .then((data) => {
-        setAboutUs(data.siteData.about);
+        setAboutUs(data.data.about);
       });
   }, [navigate]);
 

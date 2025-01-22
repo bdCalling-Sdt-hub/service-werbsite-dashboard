@@ -32,7 +32,7 @@ localStorage.removeItem("token");
         return res.json();
       })
       .then((data) => {
-        setContent(data.siteData.terms);
+        setContent(data.data.terms);
       });
   }, [navigate]);
 

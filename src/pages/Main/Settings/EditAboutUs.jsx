@@ -32,7 +32,7 @@ const EditAboutUs = () => {
         return res.json();
       })
       .then((data) => {
-        setContent(data.siteData.about);
+        setContent(data.data.about);
       });
   }, [navigate]);
 

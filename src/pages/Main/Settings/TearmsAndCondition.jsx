@@ -20,7 +20,7 @@ const TearmsAndCondition = () => {
     })
       .then((res) => {
         if (res.status === 401) {
-localStorage.removeItem("token");
+          localStorage.removeItem("token");
           navigate("/auth");
           return;
         }
@@ -28,7 +28,7 @@ localStorage.removeItem("token");
         return res.json();
       })
       .then((data) => {
-        setTermsAndConditions(data.siteData.terms);
+        setTermsAndConditions(data.data.terms);
       });
   }, [navigate]);
   return (
